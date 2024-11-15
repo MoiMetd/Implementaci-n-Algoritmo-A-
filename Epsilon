@@ -1,0 +1,82 @@
+import heapq
+import math
+
+# Definir las ciudades y las rutas entre ellas (distancias en kilómetros)
+cities = {
+    "Caracas": (10.491, -66.9036),  # Latitud, Longitud
+    "Maracaibo": (10.6538, -71.6425),
+    "Valencia": (10.1633, -68.0029),
+    "Barquisimeto": (10.0736, -69.3158),
+    "Cumaná": (10.4497, -64.1734),
+    # Agregar más ciudades según sea necesario
+}
+
+# Distancias entre las ciudades (en kilómetros)
+routes = {
+    "Caracas": {"Maracaibo": 570, "Valencia": 150, "Barquisimeto": 320, "Cumaná": 360},
+    "Maracaibo": {"Caracas": 570, "Valencia": 520, "Barquisimeto": 630, "Cumaná": 640},
+    "Valencia": {"Caracas": 150, "Maracaibo": 520, "Barquisimeto": 170, "Cumaná": 250},
+    "Barquisimeto": {"Caracas": 320, "Maracaibo": 630, "Valencia": 170, "Cumaná": 450},
+    "Cumaná": {"Caracas": 360, "Maracaibo": 640, "Valencia": 250, "Barquisimeto": 450},
+    # Agregar más rutas entre ciudades si es necesario
+}
+
+# Función de heurística: distancia en línea recta entre dos ciudades usando la fórmula de Haversine
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371  # Radio de la Tierra en kilómetros
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2) ** 2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
+
+def heuristic(a, b, epsilon=1.0):
+    # Heurística ajustada con epsilon (distancia directa entre las ciudades)
+    lat1, lon1 = cities[a]
+    lat2, lon2 = cities[b]
+    direct_distance = haversine(lat1, lon1, lat2, lon2)
+    return epsilon * direct_distance  # Ajuste de la heurística con epsilon
+
+def astar(start, goal, epsilon=1.0):
+    # Listas de nodos abiertos y cerrados
+    open_list = []
+    heapq.heappush(open_list, (0 + heuristic(start, goal, epsilon), 0, start))  # (f_score, g_score, nodo)
+    
+    came_from = {}
+    g_score = {start: 0}
+    f_score = {start: heuristic(start, goal, epsilon)}
+    
+    while open_list:
+        _, current_g, current = heapq.heappop(open_list)
+        
+        if current == goal:
+            # Reconstruir el camino
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            path.reverse()
+            return path
+        
+        for neighbor, distance in routes[current].items():
+            tentative_g_score = current_g + distance  # Costo acumulado para llegar al vecino
+            
+            if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+                came_from[neighbor] = current
+                g_score[neighbor] = tentative_g_score
+                f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal, epsilon)
+                heapq.heappush(open_list, (f_score[neighbor], tentative_g_score, neighbor))
+    
+    return None  # Si no hay camino
+
+# Ejemplo de uso
+start_city = "Caracas"  # Ciudad de inicio
+goal_city = "Maracaibo"  # Ciudad de destino
+epsilon = 1.5  # Ajuste de la heurística para ser más "agresivo" (optimista)
+
+path = astar(start_city, goal_city, epsilon)
+if path:
+    print("Ruta óptima encontrada:", path)
+else:
+    print("No se encontró un camino.")
