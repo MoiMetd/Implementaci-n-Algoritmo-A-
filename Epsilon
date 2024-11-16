@@ -7,16 +7,19 @@ ciudades = {
     "Valencia": (10.1633, -68.0029),
     "Barquisimeto": (10.0736, -69.3158),
     "Cumaná": (10.4497, -64.1734),
-    
+    "Margarita": (10.9667, -63.9167),  
+    "Mérida": (8.5939, -71.1561)
 }
 
 
 gira = {
     "Caracas": {"Maracaibo": 570, "Valencia": 150, "Barquisimeto": 320, "Cumaná": 360},
-    "Maracaibo": {"Caracas": 570, "Valencia": 520, "Barquisimeto": 630, "Cumaná": 640},
+    "Maracaibo": {"Caracas": 570, "Valencia": 520, "Barquisimeto": 630, "Mérida": 160},
     "Valencia": {"Caracas": 150, "Maracaibo": 520, "Barquisimeto": 170, "Cumaná": 250},
-    "Barquisimeto": {"Caracas": 320, "Maracaibo": 630, "Valencia": 170, "Cumaná": 450},
-    "Cumaná": {"Caracas": 360, "Maracaibo": 640, "Valencia": 250, "Barquisimeto": 450},
+    "Barquisimeto": {"Caracas": 320, "Maracaibo": 630, "Valencia": 170, "Cumaná": 450, "Mérida": 280},
+    "Cumaná": {"Caracas": 360, "Maracaibo": 640, "Valencia": 250, "Barquisimeto": 450, "Margarita": 80},
+    "Margarita": {"Cumaná": 80}, 
+    "Mérida": {"Barquisimeto": 280, "Maracaibo": 160}
 }
 
 
@@ -69,9 +72,9 @@ def a_estrella(inicio, fin, epsilon=1.0):
     return None  
 
 
-ciudad_inicio = "Caracas" 
-ciudad_final = "Maracaibo" 
-epsilon = 1.5  
+ciudad_inicio = "Mérida" 
+ciudad_final = "Caracas" 
+epsilon = 1.6  
 
 path = a_estrella(ciudad_inicio, ciudad_final, epsilon)
 if path:
