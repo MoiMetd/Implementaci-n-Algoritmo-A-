@@ -1,7 +1,6 @@
 import heapq
 import math
 
-# Definir las ciudades y las rutas entre ellas (distancias en kilómetros)
 cities = {
     "Caracas": (10.491, -66.9036),  # Latitud, Longitud
     "Maracaibo": (10.6538, -71.6425),
@@ -11,19 +10,18 @@ cities = {
     # Agregar más ciudades según sea necesario
 }
 
-# Distancias entre las ciudades (en kilómetros)
+
 routes = {
     "Caracas": {"Maracaibo": 570, "Valencia": 150, "Barquisimeto": 320, "Cumaná": 360},
     "Maracaibo": {"Caracas": 570, "Valencia": 520, "Barquisimeto": 630, "Cumaná": 640},
     "Valencia": {"Caracas": 150, "Maracaibo": 520, "Barquisimeto": 170, "Cumaná": 250},
     "Barquisimeto": {"Caracas": 320, "Maracaibo": 630, "Valencia": 170, "Cumaná": 450},
     "Cumaná": {"Caracas": 360, "Maracaibo": 640, "Valencia": 250, "Barquisimeto": 450},
-    # Agregar más rutas entre ciudades si es necesario
 }
 
-# Función de heurística: distancia en línea recta entre dos ciudades usando la fórmula de Haversine
+
 def haversine(lat1, lon1, lat2, lon2):
-    R = 6371  # Radio de la Tierra en kilómetros
+    R = 6371  
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
     a = math.sin(dlat / 2) ** 2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
@@ -31,14 +29,14 @@ def haversine(lat1, lon1, lat2, lon2):
     return R * c
 
 def heuristic(a, b, epsilon=1.0):
-    # Heurística ajustada con epsilon (distancia directa entre las ciudades)
+
     lat1, lon1 = cities[a]
     lat2, lon2 = cities[b]
     direct_distance = haversine(lat1, lon1, lat2, lon2)
-    return epsilon * direct_distance  # Ajuste de la heurística con epsilon
+    return epsilon * direct_distance 
 
 def astar(start, goal, epsilon=1.0):
-    # Listas de nodos abiertos y cerrados
+
     open_list = []
     heapq.heappush(open_list, (0 + heuristic(start, goal, epsilon), 0, start))  # (f_score, g_score, nodo)
     
@@ -60,7 +58,7 @@ def astar(start, goal, epsilon=1.0):
             return path
         
         for neighbor, distance in routes[current].items():
-            tentative_g_score = current_g + distance  # Costo acumulado para llegar al vecino
+            tentative_g_score = current_g + distance 
             
             if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
                 came_from[neighbor] = current
@@ -70,10 +68,10 @@ def astar(start, goal, epsilon=1.0):
     
     return None  # Si no hay camino
 
-# Ejemplo de uso
-start_city = "Caracas"  # Ciudad de inicio
-goal_city = "Maracaibo"  # Ciudad de destino
-epsilon = 1.5  # Ajuste de la heurística para ser más "agresivo" (optimista)
+
+start_city = "Caracas" 
+goal_city = "Maracaibo" 
+epsilon = 1.5  
 
 path = astar(start_city, goal_city, epsilon)
 if path:
