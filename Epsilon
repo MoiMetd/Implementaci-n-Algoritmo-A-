@@ -1,17 +1,17 @@
 import heapq
 import math
 
-cities = {
-    "Caracas": (10.491, -66.9036),  # Latitud, Longitud
+ciudades = {
+    "Caracas": (10.491, -66.9036), 
     "Maracaibo": (10.6538, -71.6425),
     "Valencia": (10.1633, -68.0029),
     "Barquisimeto": (10.0736, -69.3158),
     "Cumaná": (10.4497, -64.1734),
-    # Agregar más ciudades según sea necesario
+    
 }
 
 
-routes = {
+gira = {
     "Caracas": {"Maracaibo": 570, "Valencia": 150, "Barquisimeto": 320, "Cumaná": 360},
     "Maracaibo": {"Caracas": 570, "Valencia": 520, "Barquisimeto": 630, "Cumaná": 640},
     "Valencia": {"Caracas": 150, "Maracaibo": 520, "Barquisimeto": 170, "Cumaná": 250},
@@ -28,53 +28,53 @@ def haversine(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return R * c
 
-def heuristic(a, b, epsilon=1.0):
+def heuristica(a, b, epsilon=1.0):
 
-    lat1, lon1 = cities[a]
-    lat2, lon2 = cities[b]
+    lat1, lon1 = ciudades[a]
+    lat2, lon2 = ciudades[b]
     direct_distance = haversine(lat1, lon1, lat2, lon2)
     return epsilon * direct_distance 
 
-def astar(start, goal, epsilon=1.0):
+def a_estrella(inicio, fin, epsilon=1.0):
 
-    open_list = []
-    heapq.heappush(open_list, (0 + heuristic(start, goal, epsilon), 0, start))  # (f_score, g_score, nodo)
+    abierto = []
+    heapq.heappush(abierto, (0 + heuristica(inicio, fin, epsilon), 0, inicio))
     
     came_from = {}
-    g_score = {start: 0}
-    f_score = {start: heuristic(start, goal, epsilon)}
+    partida = {inicio: 0}
+    llegada = {inicio: heuristica(inicio, fin, epsilon)}
     
-    while open_list:
-        _, current_g, current = heapq.heappop(open_list)
+    while abierto:
+        _, current_i, current = heapq.heappop(abierto)
         
-        if current == goal:
-            # Reconstruir el camino
+        if current == fin:
+            
             path = []
             while current in came_from:
                 path.append(current)
                 current = came_from[current]
-            path.append(start)
+            path.append(inicio)
             path.reverse()
             return path
         
-        for neighbor, distance in routes[current].items():
-            tentative_g_score = current_g + distance 
+        for c_vecina, distance in gira[current].items():
+            tentative_partida = current_i + distance 
             
-            if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
-                came_from[neighbor] = current
-                g_score[neighbor] = tentative_g_score
-                f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal, epsilon)
-                heapq.heappush(open_list, (f_score[neighbor], tentative_g_score, neighbor))
+            if c_vecina not in partida or tentative_partida < partida[c_vecina]:
+                came_from[c_vecina] = current
+                partida[c_vecina] = tentative_partida
+                llegada[c_vecina] = tentative_partida + heuristica(c_vecina, fin, epsilon)
+                heapq.heappush(abierto, (llegada[c_vecina], tentative_partida, c_vecina))
     
-    return None  # Si no hay camino
+    return None  
 
 
-start_city = "Caracas" 
-goal_city = "Maracaibo" 
+ciudad_inicio = "Caracas" 
+ciudad_final = "Maracaibo" 
 epsilon = 1.5  
 
-path = astar(start_city, goal_city, epsilon)
+path = a_estrella(ciudad_inicio, ciudad_final, epsilon)
 if path:
-    print("Ruta óptima encontrada:", path)
+    print("Ruta óptima encontrada:", "->".join(path))
 else:
     print("No se encontró un camino.")
